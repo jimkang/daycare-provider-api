@@ -1,0 +1,5 @@
+.DS_Store
+node_modules
+config
+data/providers.db
+data/geocodedproviders.json
