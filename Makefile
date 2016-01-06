@@ -2,6 +2,7 @@ HOMEDIR = $(shell pwd)
 
 test:
 	node tests/basictests.js
+	node tests/integration-tests.js
 
 start:
 	node daycare-provider-api.js
