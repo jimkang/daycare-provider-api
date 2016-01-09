@@ -3,10 +3,6 @@ var getProviderStream = require('./get-provider-stream');
 var level = require('level');
 var JSONStream = require('JSONStream');
 
-var headers = {
-  'content-type': 'application/json'
-};
-
 var dbOpts = {
   valueEncoding: 'json'
 };
@@ -23,7 +19,9 @@ function respond(req, res, next) {
     base: req.params.name
   };
 
-  res.writeHead(200, headers);
+  res.header('Content-Type', 'application/json');
+  res.charSet('utf-8');
+  res.header('Transfer-Encoding', 'chunked');
 
   var stream = getProviderStream({
     db: db,
@@ -33,8 +31,25 @@ function respond(req, res, next) {
   stream.on('error', logError);
 
   stream
+    .on('end', endResponse)
     .pipe(JSONStream.stringify(false))
     .pipe(res);
+    // .on('data', writeToResponse);
+
+  var chunksWritten = 0;
+
+  // function writeToResponse(chunk) {
+  //   chunksWritten += 1;
+  //   console.log('chunksWritten:', chunksWritten);
+  //   if (chunk.trim() === '') {
+  //     console.log('writing empty chunk!');
+  //   }
+  //   res.write(chunk);
+  // }
+
+  function endResponse() {
+    res.end();
+  }
 
   function logError(error) {
     console.log(error, error.stack);
@@ -42,7 +57,12 @@ function respond(req, res, next) {
 }
 
 function respondHead(req, res, next) {
-  res.writeHead(200, headers);
+  res.writeHead(
+    200,
+    {
+      'content-type': 'application/json'
+    }
+  );
   res.end();
   next();
 }
