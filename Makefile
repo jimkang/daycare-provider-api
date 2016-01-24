@@ -43,4 +43,4 @@ pushall: push-docker-image
 	git push origin master
 
 data/providers.db: data/geocodedproviders.json
-	node build-db.js data/geocodedproviders.json
+	node build-db.js data/geocodedproviders.json data/providers.db
